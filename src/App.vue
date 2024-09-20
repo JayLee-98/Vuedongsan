@@ -1,62 +1,124 @@
 <template>
+  <header>
+    <nav>
+      <ul class="menu">
+        <li v-for="(item, index) in menuItems" :key="index">
+          <a @click="currentPage = item.component">{{ item.name }}</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <component :is="currentPage" @open-modal="openModal"></component>
+  </main>
+
   <div class="modal" v-if="selectedStudio">
     <div class="modal-content">
       <h4>{{ selectedStudio.title }}</h4>
-      <img :src="selectedStudio.image" class="room-img" />
+      <img :src="selectedStudio.image" class="room-img" alt="Studio Image" />
       <p>{{ selectedStudio.content }}</p>
-      <p>{{ selectedStudio.price }}원</p>
-      <button @click="selectedStudio = null">닫기</button>
+      <p><strong>가격:</strong> {{ selectedStudio.price.toLocaleString() }}원</p>
+      <button @click="closeModal">닫기</button>
     </div>
-  </div>
-
-  <div class="menu">
-    <a v-for="(menu, i) in menus" :key="i">{{ menu }}</a>
-  </div>
-
-  <div v-for="(a, i) in studios" :key="i">
-    <img :src="a.image" class="room-img" />
-    <h4 @click="openModal(a)" style="cursor: pointer">{{ a.title }}</h4>
-    <p>{{ a.price }}원</p>
   </div>
 </template>
 
 <script>
-import studios from "./assets/oneroom.js";
+import Home from './components/HomePage.vue';
+import Products from './components/ProductList.vue';
+import About from './components/AboutPage.vue';
 
 export default {
   name: "App",
+  components: {
+    Home,
+    Products,
+    About
+  },
   data() {
     return {
-      studios: studios,
       selectedStudio: null,
-      menus: ["Home", "Products", "About"],
+      currentPage: Home,
+      menuItems: [
+        { name: 'Home', component: Home },
+        { name: 'Products', component: Products },
+        { name: 'About', component: About },
+      ],
     };
   },
   methods: {
     openModal(studio) {
       this.selectedStudio = studio;
     },
+    closeModal() {
+      this.selectedStudio = null;
+    }
   },
   watch: {
     selectedStudio(newValue) {
-      if (newValue) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      document.body.style.overflow = newValue ? 'hidden' : '';
     }
   },
-  components: {},
 };
 </script>
 
 <style>
-body {
-  margin: 0;
+:root {
+  --main-color: #00ed64; /* Hulu 초록색 */
+  --accent-color: #000000; /* 검정색 */
+  --text-color: #ffffff; /* 흰색 */
+  --background-color: #121212; /* 매우 어두운 회색 */
 }
 
-div {
-  box-sizing: border-box;
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  background-color: var(--accent-color);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.menu li {
+  margin: 0 1rem;
+}
+
+.menu a {
+  color: var(--main-color);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.menu a:hover {
+  color: var(--text-color);
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .modal {
@@ -66,43 +128,50 @@ div {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .modal-content {
-  background-color: #fefefe;
-  padding: 20px;
-  border: 1px solid #888;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  padding: 2rem;
+  border-radius: 10px;
   width: 80%;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
-  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0,237,100,0.1);
 }
 
 .room-img {
   width: 100%;
-  margin-top: 40px;
-}
-
-.menu {
-  background: darkslateblue;
-  padding: 15px;
+  height: 200px;
+  object-fit: cover;
   border-radius: 5px;
-}
-.menu a {
-  color: white;
-  padding: 10px;
+  margin-bottom: 1rem;
 }
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+button {
+  background-color: var(--main-color);
+  border: none;
+  color: var(--accent-color);
+  padding: 0.5rem 1rem;
   text-align: center;
-  color: #2c3e50;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+  color: var(--main-color);
+  border: 1px solid var(--main-color);
 }
 </style>
